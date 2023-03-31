@@ -15,6 +15,29 @@ const defaultItems = [
 
 function App() {
   const [items, setItems] = useState(defaultItems);
+  const [formState, setFormState] = useState({
+    text: "",
+  });
+
+  const handleChange = (event) => {
+    setFormState({
+      ...formState,
+      [event.target.name]: event.target.value,
+    });
+  }
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    setItems([
+      ...items,
+      {
+        id: Date.now(),
+        text: formState.text,
+        done: false,
+      },
+    ]);
+    setFormState({ ...formState, text: '' });
+  }
 
   const itemComponents = items.map(item => {
     const handleChange = () => {
@@ -26,10 +49,17 @@ function App() {
       }));
     };
 
+    const handleClick = () => {
+      setItems(items.filter(newItem => {
+        return newItem.id !== item.id;
+      }));
+    };
+
     return (
       <div key={item.id}>
         <input type="checkbox" checked={item.done} onChange={handleChange} />
         {item.text}
+        <button onClick={handleClick}>X</button>
       </div>
     );
   });
@@ -37,6 +67,11 @@ function App() {
   return (
     <div>
       <h1>TODO APP</h1>
+      <form onSubmit={handleSubmit}>
+        <input type="text" name="text" onChange={handleChange}
+          value={formState.text} />
+        <button type="submit">Add item</button>
+      </form>
       {itemComponents}
     </div>
   )
